@@ -3,26 +3,26 @@ from gamelogic import game_logic
 
 
 class GameInterface:
-    size_grid = -1
-    word_grid = []
-    words = -1
-    words_left = -1
-    state = 0
-    first = [-1, -1]
-
     def __init__(self, window: Tk):
         self.win = window
         self.frame = Frame(self.win, width=1280, height=720, background="#3C388D")
+        self.size_grid = -1
+        self.words_grid = []
+        self.words = -1
+        self.words_left = -1
+        self.state = 0
+        self.first = [-1, -1]
+        self.color = ["#3C388D", "#36274C", "grey", "#f0f0f0", "green"]
 
     def homeMenu(self):
         self.frame.destroy()
-        self.frame = Frame(self.win, width=1280, height=720, background="#3C388D")
+        self.frame = Frame(self.win, width=1280, height=720, background=self.color[0])
         #self.frame.grid_rowconfigure(0, minsize=200)
         #self.frame.grid_rowconfigure(1, minsize=200)
         #self.frame.grid_rowconfigure(3, minsize=200)
 
         label_1 = Label(self.frame, text="Игра в слова",
-                        bg="#36274C",
+                        bg=self.color[1],
                         fg="white",
                         font=("Inter", 32),
                         padx="508",
@@ -31,7 +31,7 @@ class GameInterface:
         label_1.grid(row=0, column=0, columnspan=2, pady=20)
 
         label_2 = Label(self.frame, text="Размер игровой зоны:",
-                        bg="#36274C",
+                        bg=self.color[1],
                         fg="white",
                         font=("Inter", 18),
                         width="20",
@@ -40,7 +40,7 @@ class GameInterface:
         label_2.grid(row=1, column=0, stick="e", pady=20)
 
         block = Label(self.frame, text="",
-                      bg="#36274C",
+                      bg=self.color[1],
                       font=("Inter", 18),
                       width="3",
                       pady="25",
@@ -79,32 +79,32 @@ class GameInterface:
         self.frame.pack()
 
     def inGame(self, size_grid: str):
-        if size_grid.isdigit() == False:
+        if size_grid.isdigit() == False or int(size_grid) < 5 or int(size_grid) > 12:
             return
 
+        self.size_grid = int(size_grid)
         data = game_logic.startGame(self.size_grid)
         grid = data[0]
         self.words = data[1]
         self.words_left = data[1]
-        self.word_grid = data[2]
+        self.words_grid = data[2]
 
         self.frame.destroy()
-        self.frame = Frame(self.win, width=1280, height=720, background="#3C388D")
+        self.frame = Frame(self.win, width=1280, height=720, background=self.color[0])
         self.frame.grid_rowconfigure(0, pad=70)
 
-        frame_2 = Frame(self.frame, width=650, height=650, background="#36274C")
+        frame_2 = Frame(self.frame, width=650, height=650, background=self.color[1])
         frame_2.grid(row=0, column=0, padx=20)
 
-        frame_3 = Frame(self.frame, width=650, height=650, background="#36274C")
+        frame_3 = Frame(self.frame, width=650, height=650, background=self.color[1])
         frame_3.grid(row=0, column=0, padx=20)
 
-        self.size_grid = 3 #убрать после!
         buttons = []
         for i in range(self.size_grid):
             temp = []
             for j in range(self.size_grid):
-                btn = Button(frame_3, text=grid[i][j], width=3, height=1, pady="4", font=("Inter", 18))
-                btn.config(command=lambda x=i, y=j: self.userAnswer(x, y))
+                btn = Button(frame_3, text=grid[i][j], width=3, height=1, pady="4", font=("Inter", 18),
+                             disabledforeground="black", command=lambda x=i, y=j: self.userAnswer(x, y, buttons))
                 temp.append(btn)
             buttons.append(temp)
 
@@ -113,7 +113,7 @@ class GameInterface:
                 btn = buttons[i][j]
                 btn.grid(row=j, column=i)
 
-        frame_4 = Frame(self.frame, width=300, height=650, background="#3C388D")
+        frame_4 = Frame(self.frame, width=300, height=650, background=self.color[0])
         frame_4.grid(row=0, column=1)
 
         btn_1 = Button(frame_4, text="Переход в меню",
@@ -126,7 +126,7 @@ class GameInterface:
         btn_1.place(relx=0, rely=0.002)
 
         label_2 = Label(frame_4, text=f"Количество оставшихся\nслов: {self.words_left}",
-                        bg="#36274C",
+                        bg=self.color[1],
                         fg="white",
                         font=("Inter", 18),
                         width=20,
@@ -138,23 +138,63 @@ class GameInterface:
 
         self.frame.pack()
 
-    def userAnswer(self, x: int, y: int):
-        print(f"kekw {x}. {y}")
+    def changeLinesColor(self, x:int, y:int, buttons: list[list[Button]], color: str):
+        for i in range(x, self.size_grid):
+            if buttons[i][y]["background"] != "green":
+                buttons[i][y].config(background=color, activebackground=color)
+        for i in range(y, self.size_grid):
+            if buttons[x][i]["background"] != "green":
+                buttons[x][i].config(background=color, activebackground=color)
+        for i in range(self.size_grid - max(x, y)):
+            if buttons[x + i][y + i]["background"] != "green":
+                buttons[x + i][y + i].config(background=color, activebackground=color)
+        for i in range(min(self.size_grid - x, y + 1)):
+            if buttons[x + i][y - i]["background"] != "green":
+                buttons[x + i][y - i].config(background=color, activebackground=color)
+
+    def userAnswer(self, x: int, y: int, buttons: list[list[Button]]):
+        # print(f"kekw {x}. {y}")
         if self.state == 0:
             self.first = [x, y]
             self.state = 1
+            self.changeLinesColor(x, y, buttons, self.color[2])
         elif self.state == 1:
             flag = 0
-            for i in range(0, self.words_left*2, 2):
-                if self.word_grid[i][0] == self.first[0] and self.word_grid[i][1] == self.first[1] and self.word_grid[i+1][0] == x and self.word_grid[i+1][1] == y:
+            self.changeLinesColor(self.first[0], self.first[1], buttons, self.color[3])
+            for i in range(0, self.words_left):
+                if self.words_grid[i][0][0] == self.first[0] and self.words_grid[i][0][1] == self.first[1] and self.words_grid[i][1][0] == x and self.words_grid[i][1][1] == y:
                     flag = 1
-                    self.word_grid.pop(i)
-                    self.word_grid.pop(i)
+                    self.words_grid.pop(i)
                     break
             if flag == 1:
+                if x > self.first[0]:
+                    mx = 1
+                else:
+                    mx = 0
+                if y > self.first[1]:
+                    my = 1
+                elif y == self.first[1]:
+                    my = 0
+                else:
+                    my = -1
+                if mx == 1 and my == 1:
+                    for i in range(max(x + 1, y + 1) - max(self.first[0], self.first[1])):
+                        buttons[self.first[0] + i][self.first[1] + i].config(background="green", activebackground="green")
+                elif mx == 1 and my == -1:
+                    for i in range(min(x - self.first[0] + 1, self.first[1] - y + 1)):
+                        buttons[self.first[0] + i][self.first[1] - i].config(background=self.color[4], activebackground=self.color[4])
+                elif mx == 1:
+                    for i in range(self.first[0], x + 1):
+                        buttons[i][self.first[1]].config(background="green", activebackground="green")
+                else:
+                    for i in range(self.first[1], y + 1):
+                        buttons[self.first[0]][i].config(background="green", activebackground="green")
                 self.words_left -= 1
-                self.frame.winfo_children()[2].winfo_children()[1].configure(text=f"Количество оставшихся\nслов: {self.words_left}")
+                self.frame.winfo_children()[2].winfo_children()[1].configure(text=f"Количество оставшихся\nслов: {str(self.words_left)}")
                 if self.words_left == 0:
+                    for i in range(self.size_grid):
+                        for j in range(self.size_grid):
+                            buttons[i][j].config(state="disabled")
                     self.gameWon()
             self.state = 0
 
