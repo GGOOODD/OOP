@@ -211,22 +211,25 @@ class GameInterface:
                         padx="276",
                         pady="10",
                         )
-        label_1.pack(pady="20")
+        label_1.pack(pady=20)
 
-        label_1 = Label(win2, text="Статистика:\n\n"
+        time = game_logic.returnTime()
+        mins = int(time / 60)
+        secs = int(time % 60)
+        label_1 = Label(win2, text="Статистика:\n"
                                    f"Размер игрового поля: {self.size_grid}\n"
                                    f"Количество слов: {self.words}\n"
-                                   "Время: 00:00\n",
+                                   f"Время: {mins}:{secs}\n",
                         bg="#36274C",
                         fg="white",
                         font=("Inter", 18),
-                        width=25,
-                        height=5,
-                        padx="10",
+                        width=20,
+                        height=4,
+                        padx="5",
                         pady="5",
                         anchor="n",
                         )
-        label_1.pack()
+        label_1.pack(pady=30)
 
         btn_1 = Button(win2, text="Начать заново",
                        command=lambda: self.restart(win2),
@@ -235,7 +238,7 @@ class GameInterface:
                        width="20",
                        pady="10"
                        )
-        btn_1.pack(pady=20)
+        btn_1.pack()
 
         btn_2 = Button(win2, text="Перейти в меню",
                        command=lambda: self.backFromStatistics(win2),
@@ -244,7 +247,7 @@ class GameInterface:
                        width="20",
                        pady="10"
                        )
-        btn_2.pack()
+        btn_2.pack(pady=30)
 
     def restart(self, win2: Tk):
         win2.destroy()
@@ -271,7 +274,7 @@ class GameInterface:
         label_1.pack(pady="20")
 
         label_1 = Label(win2, text="Даётся матрица букв, в которой спрятаны слова.\n\n"
-                                   "Размер матрицы принимает значение от 4 до 12,\n"
+                                   "Размер матрицы принимает значение от 5 до 12,\n"
                                    "само значение задаётся на начальном экране.\n\n"
                                    "Чтобы победить, необходимо найти все слова.\n\n"
                                    "Для нахождения слова нужно нажать на первую\n"

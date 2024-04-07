@@ -1,5 +1,6 @@
 from tkinter import *
 import random
+import time
 
 
 class Point:
@@ -80,6 +81,8 @@ def doIntersect(p1, q1, p2, q2):
 
 
 class GameLogic:
+    start_time: float
+
     def startGame(self, size_grid: int):
         words = []
         words_grid = []
@@ -97,19 +100,16 @@ class GameLogic:
         retries = 0
         exist_num = []
         last_direction = -1
-        while retries < 5 or len(words) < size_grid:
+        while retries < 25 and len(words) < size_grid:
             num = random.randint(0, 9282)
             word = lines[num]
             word_len = len(word) - 1
-            # print(f"hallo {word_len}")
-            # print(f"hallo {word} and {size_grid}")
             if word_len > size_grid:
                 continue
-            # print(f"bye {words_left}")
             retries += 1
             # 1-7 не слитно ; 8-10 слитно
             merged = 1 # random.randint(1, 10)
-            for k in range(5):
+            for k in range(25):
                 # вправо ; вниз ; вниз-право ; вверх-вправо
                 direction = random.randint(0, 3)
                 if direction == last_direction:
@@ -225,7 +225,11 @@ class GameLogic:
 
         print(words)
         print(words_grid)
+        self.start_time = time.time()
         return [grid, words_left, words_grid]
+
+    def returnTime(self):
+        return time.time() - self.start_time
 
 
 game_logic = GameLogic()
