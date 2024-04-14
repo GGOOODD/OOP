@@ -9,7 +9,7 @@ class GameInterface:
         self.words_grid = []
         self.words_left = -1
         self.first = [-1, -1]
-        self.color = ["#3C388D", "#36274C", "grey", "#f0f0f0", "green"]
+        self.color = ["#3C388D", "#36274C", "grey", "#f0f0f0", "green", "#006400"]
         Frame(self.win, width=1280, height=720, background=self.color[0])
 
     def home_menu(self):
@@ -132,27 +132,35 @@ class GameInterface:
 
         frame.pack()
 
-    def change_lines_color(self, x: int, y: int, buttons: list[list[Button]], color: str):
+    def change_lines_color(self, x: int, y: int, buttons: list[list[Button]], color: str, green_color: str):
         for i in range(x, self.size_grid):
-            if buttons[i][y]["background"] != "green":
+            if buttons[i][y]["background"] != self.color[4] and buttons[i][y]["background"] != self.color[5]:
                 buttons[i][y].config(background=color, activebackground=color)
+            else:
+                buttons[i][y].config(background=green_color, activebackground=green_color)
         for i in range(y, self.size_grid):
-            if buttons[x][i]["background"] != "green":
+            if buttons[x][i]["background"] != self.color[4] and buttons[x][i]["background"] != self.color[5]:
                 buttons[x][i].config(background=color, activebackground=color)
+            else:
+                buttons[x][i].config(background=green_color, activebackground=green_color)
         for i in range(self.size_grid - max(x, y)):
-            if buttons[x + i][y + i]["background"] != "green":
+            if buttons[x + i][y + i]["background"] != self.color[4] and buttons[x + i][y + i]["background"] != self.color[5]:
                 buttons[x + i][y + i].config(background=color, activebackground=color)
+            else:
+                buttons[x + i][y + i].config(background=green_color, activebackground=green_color)
         for i in range(min(self.size_grid - x, y + 1)):
-            if buttons[x + i][y - i]["background"] != "green":
+            if buttons[x + i][y - i]["background"] != self.color[4] and buttons[x + i][y - i]["background"] != self.color[5]:
                 buttons[x + i][y - i].config(background=color, activebackground=color)
+            else:
+                buttons[x + i][y - i].config(background=green_color, activebackground=green_color)
 
     def user_answer(self, x: int, y: int, buttons: list[list[Button]], frame: Frame):
         if self.first == [-1, -1]:
             self.first = [x, y]
-            self.change_lines_color(x, y, buttons, self.color[2])
+            self.change_lines_color(x, y, buttons, self.color[2], self.color[5])
         else:
             flag = 0
-            self.change_lines_color(self.first[0], self.first[1], buttons, self.color[3])
+            self.change_lines_color(self.first[0], self.first[1], buttons, self.color[3], self.color[4])
             for i in range(0, self.words_left):
                 if self.words_grid[i][0][0] == self.first[0] and self.words_grid[i][0][1] == self.first[1] and self.words_grid[i][1][0] == x and self.words_grid[i][1][1] == y:
                     flag = 1
@@ -178,10 +186,10 @@ class GameInterface:
                     for i in range(self.size_grid):
                         for j in range(self.size_grid):
                             buttons[i][j].config(state="disabled")
-                    self.gameWon()
+                    self.game_won()
             self.first = [-1, -1]
 
-    def gameWon(self):
+    def game_won(self):
         win2 = Tk()
         win2["bg"] = "#3C388D"
         win2.title("Статистика")
@@ -224,7 +232,7 @@ class GameInterface:
         btn_1.pack()
 
         btn_2 = Button(win2, text="Перейти в меню",
-                       command=lambda: self.backFromStatistics(win2),
+                       command=lambda: self.back_from_statistics(win2),
                        activebackground="grey",
                        font=("Inter", 18),
                        width="20",
@@ -236,7 +244,7 @@ class GameInterface:
         win2.destroy()
         self.in_game(str(self.size_grid))
 
-    def backFromStatistics(self, win2: Tk):
+    def back_from_statistics(self, win2: Tk):
         win2.destroy()
         self.home_menu()
 
@@ -244,7 +252,7 @@ class GameInterface:
         win2 = Tk()
         win2["bg"] = "#3C388D"
         win2.title("Правила игры")
-        win2.geometry("720x470")
+        win2.geometry("720x490")
         win2.resizable(width=False, height=False)
 
         label_1 = Label(win2, text="Правила игры",
@@ -259,7 +267,8 @@ class GameInterface:
         label_1 = Label(win2, text="Даётся матрица букв, в которой спрятаны слова.\n\n"
                                    "Размер матрицы принимает значение от 5 до 12,\n"
                                    "само значение задаётся на начальном экране.\n\n"
-                                   "Чтобы победить, необходимо найти все слова.\n\n"
+                                   "Чтобы победить, необходимо найти все слова.\n"
+                                   "Слова могут пересекаться между собой.\n\n"
                                    "Для нахождения слова нужно нажать на первую\n"
                                    "букву слова, а после на последнюю букву.\n\n"
                                    "Количество оставшихся слов написаны в\n"
@@ -268,7 +277,7 @@ class GameInterface:
                         fg="white",
                         font=("Inter", 18),
                         width=40,
-                        height=12,
+                        height=13,
                         padx="15",
                         pady="10",
                         anchor="n",
