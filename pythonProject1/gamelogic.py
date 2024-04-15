@@ -59,8 +59,8 @@ class GameLogic:
 
         while retries < 25 and len(words) < size_grid:
             num = random.randint(0, 9275)
-            word = lines[num]
-            word_len = len(word) - 1
+            word = lines[num].rstrip()
+            word_len = len(word)
             if word_len > size_grid:
                 continue
             retries += 1
@@ -68,7 +68,7 @@ class GameLogic:
             merged = random.randint(1, 10)
             if merged < 5:
                 for k in range(25):
-                    # вправо ; вниз ; вниз-право ; вверх-вправо
+                    # 0 - вправо ; 1 - вниз ; 2 - вниз-право ; 3 - вверх-вправо
                     dir_num = random.randint(0, 3)
                     if dir_num == last_direction:
                         continue
