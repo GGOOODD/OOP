@@ -44,22 +44,37 @@ class Intersect:
 class GameLogic:
     start_time: float
     words_left: int
+    types: tuple
 
-    def generate_words(self, size_grid: int):
+    def generate_words(self, size_grid: int, types: tuple):
         words = []
         words_grid = []
         self.words_left = 0
+        self.types = types
 
-        with open("words.txt", encoding="UTF-8") as f:
-            lines = f.readlines()
+        types_lines = []
+        types_txt = {0: "animals.txt", 1: "biology.txt", 2: "physics.txt", 3: "plants.txt", 4: "professions.txt", 5: "sport.txt", 6: "technology.txt"}
+
+        for i in types:
+            with open(f"./types/{types_txt[i]}", "r", encoding="UTF-8") as f:
+                lines = f.readlines()
+            types_lines.append(lines)
 
         retries = 0
         exist_num = []
         last_direction = -1
 
         while retries < 25 and len(words) < size_grid:
-            num = random.randint(0, 9275)
-            word = lines[num].rstrip()
+            type_num = random.randint(0, len(types) - 1)
+            num = random.randint(0, 100)
+            flag = 0
+            for i in range(len(exist_num)):
+                if exist_num[i][0] == type_num and exist_num[i][1] == num:
+                    flag = 1
+                    break
+            if flag == 1:
+                continue
+            word = types_lines[type_num][num].rstrip()
             word_len = len(word)
             if word_len > size_grid:
                 continue
@@ -99,7 +114,7 @@ class GameLogic:
                                  3: [x + word_len - 1, y - (word_len - 1)]}
                         words_grid.append([[x, y], dir_3[dir_num], dir_num])
                         self.words_left += 1
-                        exist_num.append(num)
+                        exist_num.append([type_num, num])
                         last_direction = dir_num
                         retries = 0
                         break
@@ -153,7 +168,7 @@ class GameLogic:
                                              3: [p1["x"] + word_len - 1, p1["y"] - (word_len - 1)]}
                                     words_grid.append([[p1["x"], p1["y"]], dir_4[dir_num], dir_num])
                                     self.words_left += 1
-                                    exist_num.append(num)
+                                    exist_num.append([type_num, num])
                                     last_direction = dir_num
                                     retries = 0
                                     break
@@ -199,9 +214,9 @@ class GameLogic:
 
         return grid
 
-    def start_game(self, size_grid: int):
+    def start_game(self, size_grid: int, types: tuple):
         # выбор слов и их расположения на сетке
-        result = self.generate_words(size_grid)
+        result = self.generate_words(size_grid, types)
         words = result["words"]
         words_grid = result["words_grid"]
 

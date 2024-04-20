@@ -8,6 +8,7 @@ class GameInterface:
         self.size_grid = -1
         self.words_grid = []
         self.words_left = -1
+        self.types = ()
         self.first = [-1, -1]
         self.color = ["#3C388D", "#36274C", "grey", "#f0f0f0", "green", "#006400"]
         Frame(self.win, width=1280, height=720, background=self.color[0])
@@ -25,31 +26,44 @@ class GameInterface:
                         )
         label_1.grid(row=0, column=0, columnspan=2, pady=20)
 
-        label_2 = Label(frame, text="Размер игровой зоны:",
+        frame1 = Frame(frame, background=self.color[0])
+        frame1.grid(row=1, column=0, pady=20, stick="e", padx="10")
+
+        label_2 = Label(frame1, text="Размер игровой зоны:",
                         bg=self.color[1],
                         fg="white",
                         font=("Inter", 18),
                         width="20",
-                        pady="25",
+                        pady="23",
                         )
-        label_2.grid(row=1, column=0, stick="e", pady=20)
+        label_2.grid(row=0, column=0, stick="e", pady=20)
 
-        block = Label(frame, text="",
+        block = Label(frame1, text="",
                       bg=self.color[1],
                       font=("Inter", 18),
                       width="3",
-                      pady="25",
+                      pady="23",
                       )
-        block.grid(row=1, column=1, stick="w")
+        block.grid(row=0, column=1, stick="w")
 
-        entry = Entry(frame, font=("Inter", 18), width=2)
-        entry.grid(row=1, column=1, stick="w")
+        entry = Entry(frame1, font=("Inter", 18), width=2)
+        entry.grid(row=0, column=1, stick="w")
+
+        frame2 = Frame(frame, background=self.color[1])
+        frame2.grid(row=1, column=1, stick="w", padx="10")
+
+        types = ["Животные", "Биология", "Физика", "Растения", "Профессии", "Спорт", "Технологии"]
+        types_var = StringVar(value=types)
+        listbox = Listbox(frame2, listvariable=types_var, selectmode=MULTIPLE, font=("Inter", 18), width=10, height=7)
+        listbox.select_set(0, 6)
+        listbox.pack()
 
         btn_1 = Button(frame, text="Начать игру",
-                       command=lambda: self.in_game(entry.get()),
+                       command=lambda: self.in_game(entry.get(), listbox.curselection()),
                        activebackground="grey",
                        font=("Inter", 18),
-                       width="20",
+                       width="25",
+                       padx="66",
                        pady="10"
                        )
         btn_1.grid(row=2, column=0, columnspan=2, pady=20)
@@ -58,27 +72,30 @@ class GameInterface:
                        command=self.rules,
                        activebackground="grey",
                        font=("Inter", 18),
-                       width="20",
+                       width="25",
+                       padx="66",
                        pady="10"
                        )
-        btn_2.grid(row=3, column=0, columnspan=2, pady=20)
+        btn_2.grid(row=3, column=0, columnspan=2)
 
         btn_3 = Button(frame, text="Выход",
                        command=self.win.quit,
                        activebackground="grey",
                        font=("Inter", 18),
-                       width="20",
+                       width="25",
+                       padx="66",
                        pady="10"
                        )
         btn_3.grid(row=4, column=0, columnspan=2, pady=20)
         frame.pack()
 
-    def in_game(self, size_grid: str):
-        if size_grid.isdigit() is False or int(size_grid) < 5 or int(size_grid) > 12:
+    def in_game(self, size_grid: str, types: tuple):
+        if size_grid.isdigit() is False or int(size_grid) < 5 or int(size_grid) > 12 or len(types) == 0:
             return
 
         self.size_grid = int(size_grid)
-        data = game_logic.start_game(self.size_grid)
+        self.types = types
+        data = game_logic.start_game(self.size_grid, types)
         grid = data["grid"]
         self.words_left = data["words_left"]
         self.words_grid = data["words_grid"]
@@ -242,7 +259,7 @@ class GameInterface:
 
     def restart(self, win2: Tk):
         win2.destroy()
-        self.in_game(str(self.size_grid))
+        self.in_game(str(self.size_grid), self.types)
 
     def back_from_statistics(self, win2: Tk):
         win2.destroy()
