@@ -1,6 +1,5 @@
 from tkinter import *
 from gameinterface import GameInterface
-# #3C388D
 
 
 def run():
