@@ -4,7 +4,8 @@ from gamelogic import game_logic, Intersect
 class TestGameLogic(unittest.TestCase):
     def test_generate_words(self):
         size = 5
-        data = game_logic.generate_words(size)
+        types = (0, 1, 2, 3, 4, 5, 6)
+        data = game_logic.generate_words(size, types)
         words = data["words"]
         words_grid = data["words_grid"]
         for i in range(len(words)):
@@ -35,7 +36,8 @@ class TestGameLogic(unittest.TestCase):
 
     def test_place_words_on_grid(self):
         size = 5
-        data = game_logic.generate_words(size)
+        types = (0, 1, 2, 3, 4, 5, 6)
+        data = game_logic.generate_words(size, types)
         words = data["words"]
         words_grid = data["words_grid"]
         # words = ['маша', 'храм', 'цикл', 'ток', 'мина']
